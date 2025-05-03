@@ -1,0 +1,36 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary" // Use this if you're on 32-bit systems
+}
+
+datasource db {
+  provider = "mysql" // Or use "postgresql" if you're using PostgreSQL
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  posts     Post[]
+  session   Session?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
